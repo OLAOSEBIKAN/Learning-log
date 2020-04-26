@@ -3,13 +3,14 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from .models import Topic, Entry
 from .forms import TopicForm, EntryForm
+from django.contrib.auth.decorators import login_required
 
 
 def index(request):
     """The homepage for learning logs"""
     return render(request, 'learning_logs/index.html')
 
-
+@login_required
 def topics(request):
     """All the topics in our database"""
     topics = Topic.objects.order_by('date_added')
@@ -18,6 +19,7 @@ def topics(request):
     return render(request, template, context)
 
 
+@login_required
 def topic(request, pk):
     """Specific topic that the user request"""
     topic = Topic.objects.get(id=pk)
@@ -27,6 +29,7 @@ def topic(request, pk):
     return render(request, template, context)
 
 
+@login_required
 def new_topic(request):
     #Add a new topic
     if request.method != 'POST':
@@ -42,6 +45,7 @@ def new_topic(request):
     return render(request, template, context)
 
 
+@login_required
 def new_entry(request, topic_id):
     topic = Topic.objects.get(id=topic_id)
     if request.method != 'POST':
@@ -58,6 +62,7 @@ def new_entry(request, topic_id):
     return render(request, template, context)
 
 
+@login_required
 def edit_entry(request, entry_id):
     entry = Entry.objects.get(id=entry_id)
     topic = entry.topic

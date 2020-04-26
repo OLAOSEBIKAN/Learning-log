@@ -1,5 +1,12 @@
 {% extends "learning_logs/base.html" %}
 {% block content %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{message.tags}}">
+    {{ message }}
+</div>
+{% endfor %}
+{% endif %}
 <p>Learning Log</p>
 <p>Learning Log helps you keep track of your learning, for any topic you're
 learning about.</p>
