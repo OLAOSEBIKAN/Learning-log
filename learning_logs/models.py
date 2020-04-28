@@ -14,7 +14,7 @@ class Topic(models.Model):
 
 
 class Entry(models.Model):
-    """something sepecific learned"""
+    """something specific learned"""
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
     text = models.TextField()
     date_added = models.DateTimeField(auto_now_add=True)

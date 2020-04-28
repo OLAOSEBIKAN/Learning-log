@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect, Http404
 from django.urls import reverse
 from .models import Topic, Entry
 from .forms import TopicForm, EntryForm
@@ -10,19 +10,26 @@ def index(request):
     """The homepage for learning logs"""
     return render(request, 'learning_logs/index.html')
 
+
 @login_required
 def topics(request):
     """All the topics in our database"""
-    topics = Topic.objects.order_by('date_added')
+    topics = Topic.objects.filter(owner=request.user).order_by('date_added')
     template = 'learning_logs/topics.html'
     context = {'topics': topics}
     return render(request, template, context)
 
 
+def check_user(topic, request):
+    if topic.owner != request.user:
+        raise Http404
+
+
 @login_required
 def topic(request, pk):
     """Specific topic that the user request"""
-    topic = Topic.objects.get(id=pk)
+    topic = get_object_or_404(Topic, id=pk)
+    check_user(topic, request)
     entries = topic.entry_set.order_by('-date_added')
     template = 'learning_logs/topic.html'
     context = {'topic': topic, 'entries': entries}
@@ -38,7 +45,9 @@ def new_topic(request):
     else:
         form = TopicForm(request.POST)
         if form.is_valid():
-            form.save()
+            new_topic = form.save(commit=False)
+            new_topic.owner = request.user
+            new_topic.save()
             return HttpResponseRedirect(reverse('topics'))
     context = {'form': form}
     template = 'learning_logs/new_topic.html'
@@ -48,6 +57,7 @@ def new_topic(request):
 @login_required
 def new_entry(request, topic_id):
     topic = Topic.objects.get(id=topic_id)
+    check_user(topic, request)
     if request.method != 'POST':
        form = EntryForm()
     else:
@@ -66,6 +76,7 @@ def new_entry(request, topic_id):
 def edit_entry(request, entry_id):
     entry = Entry.objects.get(id=entry_id)
     topic = entry.topic
+    check_user(topic, request)
     if request.method != 'POST':
        form = EntryForm(instance=entry)
     else:
