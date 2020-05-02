@@ -1,9 +1,11 @@
+from django.db import IntegrityError
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, Http404
 from django.urls import reverse
 from .models import Topic, Entry
 from .forms import TopicForm, EntryForm
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 
 def index(request):
@@ -45,10 +47,13 @@ def new_topic(request):
     else:
         form = TopicForm(request.POST)
         if form.is_valid():
-            new_topic = form.save(commit=False)
-            new_topic.owner = request.user
-            new_topic.save()
-            return HttpResponseRedirect(reverse('topics'))
+            try:
+                new_topic = form.save(commit=False)
+                new_topic.owner = request.user
+                new_topic.save()
+                return HttpResponseRedirect(reverse('topics'))
+            except IntegrityError:
+                messages.success(request, f"You can't log this topic twice")
     context = {'form': form}
     template = 'learning_logs/new_topic.html'
     return render(request, template, context)
@@ -63,10 +68,13 @@ def new_entry(request, slug):
     else:
         form = EntryForm(data=request.POST)
         if form.is_valid():
-            new_entry = form.save(commit=False)
-            new_entry.topic = topic
-            new_entry.save()
-            return HttpResponseRedirect(reverse('topic', args=[slug]))
+            try:
+                new_entry = form.save(commit=False)
+                new_entry.topic = topic
+                new_entry.save()
+                return HttpResponseRedirect(reverse('topic', args=[slug]))
+            except IntegrityError:
+                messages.success(request, f"You can't add this entry twice")
     context = {'topic': topic, 'form': form}
     template = 'learning_logs/new_entry.html'
     return render(request, template, context)
@@ -82,8 +90,11 @@ def edit_entry(request, slug):
     else:
         form = EntryForm(instance=entry, data=request.POST)
         if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse('topic', args=[topic.slug]))
+            try:
+                form.save()
+                return HttpResponseRedirect(reverse('topic', args=[topic.slug]))
+            except IntegrityError:
+                messages.success(request, f"You can't add this entry twice")
     context = {'entry': entry, 'topic': topic, 'form': form}
     template = 'learning_logs/edit_entry.html'
     return render(request, template, context)

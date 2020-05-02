@@ -8,10 +8,12 @@
 <form action="{% url 'new_entry' topic.slug %}" method='post' class="form">
     {% csrf_token %}
     {% bootstrap_form form %}
-    {% if form.errors %}
-    <div class="text-danger">
-        {{ form.errors }}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{message.tags}}">
+    {{ message }}
     </div>
+    {% endfor %}
     {% endif %}
     {% buttons %}
     <button name="submit" class="btn btn-primary">add entry</button>

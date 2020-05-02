@@ -50,8 +50,8 @@ class Entry(models.Model):
             unique_slug = my_slug
             self.slug = my_slug
             while Entry.objects.filter(slug=unique_slug).exists():
-                unique_slug = '{} {}'.format(my_slug, topic)
-                topic += 1
+                unique_slug = '{} {}'.format(my_slug, self.date_added)
+                startpoint += 1
             self.slug = unique_slug
         return super().save(*args, **kwargs)'''
 

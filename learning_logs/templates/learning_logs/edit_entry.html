@@ -8,6 +8,13 @@
 <form action="{% url 'edit_entry' entry.slug %}" method='post' class="form">
     {% csrf_token %}
     {% bootstrap_form form %}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{message.tags}}">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
     {% buttons %}
     <button name="submit" class="btn btn-primary">update</button>
     {% endbuttons %}
