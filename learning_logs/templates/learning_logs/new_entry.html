@@ -4,11 +4,15 @@
 <h2>Add a new entry:</h2>
 {% endblock header %}
 {% block content %}
-<h2><a href="{% url 'topic' topic.id %}">{{ topic }}</a></h2>
-<p>Add a new entry:</p>
-<form action="{% url 'new_entry' topic.id %}" method='post' class="form">
+<h2><a href="{% url 'topic' topic.slug %}">{{ topic }}</a></h2>
+<form action="{% url 'new_entry' topic.slug %}" method='post' class="form">
     {% csrf_token %}
     {% bootstrap_form form %}
+    {% if form.errors %}
+    <div class="text-danger">
+        {{ form.errors }}
+    </div>
+    {% endif %}
     {% buttons %}
     <button name="submit" class="btn btn-primary">add entry</button>
     {% endbuttons %}

@@ -1,9 +1,10 @@
 {% extends 'learning_logs/base.html' %}
+{% load bootstrap3 %}
 {% block header %}
 <h2>{{ topic }}</h2>
 {% endblock header %}
 {% block content %}
-  <h3>Entries</h3>
+  <h2>Entries</h2>
   <ul>
   {% for entry in entries %}
     <div class="panel panel-default">
@@ -11,7 +12,7 @@
         <h3>
           {{ entry.date_added|date:'M d, Y H:i' }}
           <small>
-            <a href="{% url 'edit_entry' entry.id %}">
+            <a href="{% url 'edit_entry' entry.slug %}">
               edit entry</a>
           </small>
         </h3>
@@ -24,7 +25,7 @@
       There are no entries for this topic yet.
   {% endfor %}
   </ul>
-  <p>
-    <a href="{% url 'new_entry' topic.id %}">add new entry</a>
-</p>
+  {% buttons %}
+    <a href="{% url 'new_entry' topic.slug %}" class="btn btn-primary">add new entry</a>
+  {% endbuttons %}
 {% endblock content %}

@@ -13,18 +13,23 @@ def log_out(request):
 
 
 def register(request):
-    if request.method != 'POST':
-        form = UserCreationForm()
+    if request.user.is_authenticated:
+        # redirect user to the profile page
+        messages.success(request, f"You're signed in already")
+        return HttpResponseRedirect(reverse('index'))
     else:
-        form = UserCreationForm(data=request.POST)
-        if form.is_valid():
-            new_user = form.save()
-            # Log the user in and then redirect to home page.
-            authenticated_user = authenticate(username=new_user.username,
-                                              password=request.POST['password1'])
-            login(request, authenticated_user)
-            messages.success(request, f"Your Account has been registered and you're logged in")
-            return HttpResponseRedirect(reverse('index'))
+        if request.method != 'POST':
+            form = UserCreationForm()
+        else:
+            form = UserCreationForm(data=request.POST)
+            if form.is_valid():
+                new_user = form.save()
+                # Log the user in and then redirect to home page.
+                authenticated_user = authenticate(username=new_user.username,
+                                                  password=request.POST['password1'])
+                login(request, authenticated_user)
+                messages.success(request, f"Your Account has been registered and you're logged in")
+                return HttpResponseRedirect(reverse('index'))
     context = {'form': form}
     template = 'users/register.html'
     return render(request, template, context)

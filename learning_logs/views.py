@@ -26,9 +26,9 @@ def check_user(topic, request):
 
 
 @login_required
-def topic(request, pk):
+def topic(request, slug):
     """Specific topic that the user request"""
-    topic = get_object_or_404(Topic, id=pk)
+    topic = get_object_or_404(Topic, slug=slug, owner=request.user)
     check_user(topic, request)
     entries = topic.entry_set.order_by('-date_added')
     template = 'learning_logs/topic.html'
@@ -55,8 +55,8 @@ def new_topic(request):
 
 
 @login_required
-def new_entry(request, topic_id):
-    topic = get_object_or_404(Topic, id=topic_id)
+def new_entry(request, slug):
+    topic = get_object_or_404(Topic, slug=slug, owner=request.user)
     check_user(topic, request)
     if request.method != 'POST':
        form = EntryForm()
@@ -66,15 +66,15 @@ def new_entry(request, topic_id):
             new_entry = form.save(commit=False)
             new_entry.topic = topic
             new_entry.save()
-            return HttpResponseRedirect(reverse('topic', args=[topic_id]))
+            return HttpResponseRedirect(reverse('topic', args=[slug]))
     context = {'topic': topic, 'form': form}
     template = 'learning_logs/new_entry.html'
     return render(request, template, context)
 
 
 @login_required
-def edit_entry(request, entry_id):
-    entry = get_object_or_404(Entry, id=entry_id)
+def edit_entry(request, slug):
+    entry = get_object_or_404(Entry, slug=slug)
     topic = entry.topic
     check_user(topic, request)
     if request.method != 'POST':
@@ -83,7 +83,7 @@ def edit_entry(request, entry_id):
         form = EntryForm(instance=entry, data=request.POST)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(reverse('topic', args=[topic.id]))
+            return HttpResponseRedirect(reverse('topic', args=[topic.slug]))
     context = {'entry': entry, 'topic': topic, 'form': form}
     template = 'learning_logs/edit_entry.html'
     return render(request, template, context)
