@@ -32,7 +32,7 @@ class Entry(models.Model):
 
     class Meta:
         verbose_name_plural = 'entries'
-        unique_together = ('topic', 'text')
+        unique_together = ('topic', 'text', 'id')
 
     def __str__(self):
         """Return a string representation of the model"""
