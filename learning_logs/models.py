@@ -8,7 +8,7 @@ class Topic(models.Model):
     text = models.CharField(max_length=200)
     date_added = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
-    slug = models.SlugField(null=False)
+    slug = models.SlugField(null=True)
 
     class Meta:
         unique_together = ('text', 'owner')
@@ -28,7 +28,7 @@ class Entry(models.Model):
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
     text = models.TextField()
     date_added = models.DateTimeField(auto_now_add=True)
-    slug = models.SlugField(null=False)
+    slug = models.SlugField(null=True)
 
     class Meta:
         verbose_name_plural = 'entries'
